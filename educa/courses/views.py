@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse_lazy
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic.base import TemplateResponseMixin, View
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -13,7 +13,11 @@ from braces.views import LoginRequiredMixin, PermissionRequiredMixin, \
 from students.forms import CourseEnrollForm
 from .models import Subject, Course, Module, Content
 from .forms import ModuleFormSet
+from django.http import HttpResponse
 
+
+def index(request):
+    return render(request, 'index.html')
 
 class OwnerMixin(object):
     def get_queryset(self):
@@ -189,7 +193,7 @@ class CourseListView(TemplateResponseMixin, View):
         courses = Course.objects.annotate(total_modules=Count('modules'))
         if subject:
             subject = get_object_or_404(Subject, slug=subject)
-            courses = all_courses.filter(subject=subject)
+            courses = courses.filter(subject=subject)
         return self.render_to_response({'subjects': subjects,
                                         'subject': subject,
                                         'courses': courses})
